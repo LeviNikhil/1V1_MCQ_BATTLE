@@ -3,12 +3,14 @@ const express = require("express");
 const dbConnect = require("./config/mongoose");
 const errorHandler = require("./middlewares/errorHandler");
 const app = express();
+const bodyParser = require("body-parser");
+const cors = require("cors"); // Import CORS middleware
 
 dbConnect();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));            // parse data
-
+// Middleware
+app.use(cors()); // Enable CORS for all routes
+app.use(bodyParser.json());
 // Routes
 const userRoutes = require("./routes/userRoutes");
 const mcqRoutes = require("./routes/mcqRoutes");

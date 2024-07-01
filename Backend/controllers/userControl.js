@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const registerUser = asyncHandler(async (req, res) => {
   // using bcrypt
-  const { name, email, contactNo, password } = req.body;
+  const { Username, email, contactNo, password } = req.body;
   //hash the password
   const hashedPwd = await bcrypt.hash(password, 10); // in 10 rounds
   const userAvailable = await User.findOne({ email }); // jo sabse pehla milega
@@ -15,14 +15,14 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("email already exists");
   }
   const user = await User.create({
-    name,
+    Username,
     email,
     contactNo,
     password: hashedPwd,
   });
   console.log("User registered!!");
   console.log(user);
-  res.json({ message: `user: ${name} registered : ${user}` });
+  res.json({ message: `user: ${Username} registered : ${user}` });
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -39,13 +39,13 @@ const loginUser = asyncHandler(async (req, res) => {
     const accesstoken = jwt.sign(
       {
         user: {
-          name: user.name,
+          Username: user.Username,
           email: user.email,
           id: user.id,
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "30m" }
+      { expiresIn: "1hr" }
     );
     res.status(200).json({ accesstoken });
   } else {

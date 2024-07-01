@@ -4,7 +4,7 @@ const {registerUser, loginUser, wish} = require("../controllers/userControl");
 const validateToken = require("../middlewares/validateTokenHandler");
 
 router.post("/register", registerUser);
-router.get("/login", loginUser);
+router.post("/login", loginUser);
 
 router.get("/auth", validateToken, wish);
 

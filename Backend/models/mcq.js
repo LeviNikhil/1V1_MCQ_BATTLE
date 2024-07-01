@@ -6,16 +6,6 @@ const mcqSchema = new Schema({
     type: String,
     required: true
   },
-  subject: {
-    type: String,
-    required: true,
-    enum: ['Math', 'Science', 'History', 'Geography', 'Literature', 'Art', 'Music', 'Sports'] 
-  },
-  difficulty: {
-    type: String,
-    required: true,
-    enum: ['Easy', 'Medium', 'Hard']
-  },
   options: {
     option1: {
       type: String,
@@ -38,7 +28,18 @@ const mcqSchema = new Schema({
     type: String,
     required: true,
     enum: ['option1', 'option2', 'option3', 'option4']
+  },
+  difficulty: {
+    type: String,
+    required: true,
+    enum: ['Easy', 'Medium', 'Hard']
+  },
+  subject: {
+    type: String,
+    required: true,
+    enum: ['Math', 'Science', 'History', 'Geography', 'Literature', 'Art', 'Music', 'Sports'] 
   }
+  
 });
 
 
