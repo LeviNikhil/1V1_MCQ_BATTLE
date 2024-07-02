@@ -7,6 +7,7 @@ exports.createMCQ = asyncHandler(async (req, res) => {
     const mcq = new MCQ({ question, options, correctOption, difficulty, subject });
     await mcq.save();
     res.status(201).send('MCQ created');
+    
   } catch (err) {
     res.status(400).send(err.message);
   }

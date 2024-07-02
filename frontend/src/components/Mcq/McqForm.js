@@ -12,9 +12,9 @@ const MCQForm = () => {
       option3: '',
       option4: ''
     },
-    correctOption: '',
-    difficulty: '',
-    subject: ''
+    correctOption: 'option1',
+    difficulty: 'Easy',
+    subject: 'Math'
   });
 
   const { authToken } = useContext(AuthContext);
@@ -30,7 +30,7 @@ const MCQForm = () => {
         try {
           const response = await axios.get(`http://localhost:5000/api/mcqs/${id}`, {
             headers: {
-              'x-auth-token': authToken
+              'Authorization': authToken
             }
           });
           setFormData(response.data);
@@ -69,13 +69,15 @@ const MCQForm = () => {
         difficulty: formData.difficulty,
         subject: formData.subject
       };
+      
       // Make the request
       await axios[method](url, formDataToSend, {
         headers: {
-          'x-auth-token': authToken,
+          'Authorization': authToken,
           'Content-Type': 'application/json'
         }
       });
+      // console.log(formData.question);
       navigate('/mcqs'); // Redirect to the MCQ list
     } catch (error) {
       console.error('Error:', error);

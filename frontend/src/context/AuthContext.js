@@ -5,9 +5,13 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(localStorage.getItem('authToken'));
 
+  useEffect(() => {
+    console.log('Initial Auth Token in AuthContext:', authToken);
+  }, []);
+
   const setToken = (token) => {
     setAuthToken(token);
-    localStorage.setItem('authToken', token);
+    localStorage.setItem('authToken', token);  // Ensure token is not null or undefined here
     console.log('Token set in AuthContext:', token);
   };
 
@@ -16,10 +20,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('authToken');
     console.log('Token removed in AuthContext');
   };
-
-  useEffect(() => {
-    console.log('Initial Auth Token in AuthContext:', authToken);
-  }, []);
 
   return (
     <AuthContext.Provider value={{ authToken, setAuthToken: setToken, logout }}>

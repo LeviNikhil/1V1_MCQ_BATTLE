@@ -6,14 +6,14 @@ import MCQItem from './McqItem';
 
 const MCQList = () => {
   const [mcqs, setMcqs] = useState([]);
-  const {authToken} = useContext(AuthContext);
+  const { authToken } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchMcqs = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/mcqs', {
           headers: {
-            'x-auth-token': authToken
+            'Authorization': authToken
           }
         });
         setMcqs(response.data);
@@ -25,12 +25,16 @@ const MCQList = () => {
     fetchMcqs();
   }, [authToken]);
 
+  const handleDeleteMCQ = (deletedMcqId) => {
+    setMcqs(mcqs.filter(mcq => mcq._id !== deletedMcqId));
+  };
+
   return (
     <div>
       <h2>MCQ List</h2>
       <Link to="/mcqs/new">Create New MCQ</Link>
       {mcqs.map(mcq => (
-        <MCQItem key={mcq._id} mcq={mcq} />
+        <MCQItem key={mcq._id} mcq={mcq} onDelete={handleDeleteMCQ} />
       ))}
     </div>
   );
