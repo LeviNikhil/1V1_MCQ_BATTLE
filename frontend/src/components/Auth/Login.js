@@ -1,63 +1,63 @@
-import React, { useState, useContext } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { AuthContext } from "../../context/AuthContext";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import { Button, Form, Input } from "antd";
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Urls } from "../../constant/Urls";
+import AuthContext from "../../contexts/auth.context";
+import { login } from "../../services/api/auth/auth.service"; // Import the login service
+import AuthCookies from "../../services/cookie/authToken.cookie";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const { setIsLoggedInUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const { setAuthToken } = useContext(AuthContext);
-  const navigate = useNavigate(); // Initialize useNavigate
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("Form data:", formData); // Check if formData is correctly populated
+  const onFinish = async (values) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/users/login",
-        formData
-      );
-      console.log("Login response:", response.data); // Check response data
-      console.log(response.data.accesstoken);
-      setAuthToken("Bearer " + response.data.accesstoken); // Set the auth token
-      navigate("/mcqs"); // Redirect to the MCQ list
-    } catch (error) {
-      console.error("Login failed!", error);
-      // Handle error
+      const response = await login(values); // Use the login service
+      console.log('Login response:', response);  // Debugging
+      AuthCookies.SetAccessToken(response.data.accessToken);
+      AuthCookies.SetRefreshToken(response.data.refresh);
+      setIsLoggedInUser(true);
+      toast.success("Login successful!");
+      navigate(Urls.Home());
+    } catch (err) {
+      console.error('Login error:', err);  // Debugging
+      toast.error("Incorrect username or password!");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Email</label>
-        <input
-          type="email"
+    <div className="flex items-center justify-center flex-grow px-8 py-24 bg-gray-100">
+      <Form
+        name="login"
+        className="w-full max-w-md p-8 bg-white shadow-md rounded-xl "
+        initialValues={{ remember: true }}
+        onFinish={onFinish}
+      >
+        <h2 className="mb-6 text-2xl font-bold text-center">Log In</h2>
+        <Form.Item
           name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Password</label>
-        <input
-          type="password"
+          rules={[{ required: true, message: "Please input your Email!" }]}
+        >
+          <Input prefix={<MailOutlined />} placeholder="Email" />
+        </Form.Item>
+        <Form.Item
           name="password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <button type="submit">Log In</button>
-    </form>
+          rules={[{ required: true, message: "Please input your Password!" }]}
+        >
+          <Input.Password prefix={<LockOutlined />} placeholder="Password" />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" className="w-full">
+            Log In
+          </Button>
+        </Form.Item>
+        <div className="text-center">
+          Or <a href={Urls.Signup()}>register now!</a>
+        </div>
+      </Form>
+    </div>
   );
 };
 

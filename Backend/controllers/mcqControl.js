@@ -40,6 +40,20 @@ exports.getMCQs = asyncHandler(async (req, res) => {
   }
 });
 
+exports.getMCQ = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const mcq = await MCQ.findById(id);  // Corrected to findById
+    if (!mcq) {
+      return res.status(404).json({ message: 'MCQ not found' });
+    }
+    res.status(200).json(mcq);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+
 exports.updateMCQ = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { question, options, correctOption, difficulty, subject } = req.body;

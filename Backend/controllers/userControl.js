@@ -4,64 +4,75 @@ const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
+// Register User
 const registerUser = asyncHandler(async (req, res) => {
-  // using bcrypt
-  const { Username, email, contactNo, password } = req.body;
-  //hash the password
-  const hashedPwd = await bcrypt.hash(password, 10); // in 10 rounds
-  const userAvailable = await User.findOne({ email }); // jo sabse pehla milega
+  const { first_name, last_name, email, password } = req.body;
+
+  // Hash the password
+  const hashedPwd = await bcrypt.hash(password, 10);
+
+  // Check if user already exists
+  const userAvailable = await User.findOne({ email });
   if (userAvailable) {
     res.status(400);
-    throw new Error("email already exists");
+    throw new Error("Email already exists");
   }
+
+  // Create new user
   const user = await User.create({
-    Username,
+    first_name,
+    last_name,
     email,
-    contactNo,
     password: hashedPwd,
   });
+
   console.log("User registered!!");
   console.log(user);
-  res.json({ message: `user: ${Username} registered : ${user}` });
+
+  res.status(201).json({ message: `User: ${first_name} ${last_name} registered successfully` });
 });
 
+// Login User
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+
   if (!email || !password) {
     res.status(400);
     throw new Error("All fields are mandatory");
   }
+
   const user = await User.findOne({ email });
 
-  // console.log(process.env.ACCESS_TOKEN_SECRET);
-  // compare password with hashed password
+  // Compare password with hashed password
   if (user && (await bcrypt.compare(password, user.password))) {
-    const accesstoken = jwt.sign(
+    const accessToken = jwt.sign(
       {
         user: {
-          Username: user.Username,
+          first_name: user.first_name,
+          last_name: user.last_name,
           email: user.email,
-          id: user.id,
+          id: user._id,
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1hr" }
+      { expiresIn: "5h" }
     );
-    res.status(200).json({ accesstoken });
+
+    res.status(200).json({ accessToken });
   } else {
     res.status(401);
-    throw new Error("email or password is not valid");
+    throw new Error("Email or password is not valid");
   }
 
-  console.log(req);
   console.log("You are logged in");
-  res.json({message: "Login ka response"});
+  res.json({ message: "Login successful" });
 });
 
-// Happy birthday (for testing)
-const wish = async (req, res) => {
-  res.json(req.user);
+const wish = (req, res) => {
+  res.status(200).json({
+    message: "You have accessed a protected route!",
+    user: req.user,
+  });
 };
 
-// export more than 1
 module.exports = { registerUser, loginUser, wish };
